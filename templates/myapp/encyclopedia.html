@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн-энциклопедия</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.light {
+            background-color: white;
+            color: black;
+        }
+        body.dark {
+            background-color: #333;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .toggle-button {
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .theme-selector {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="light">
+    <div class="container">
+        <h1>Онлайн-энциклопедия</h1>
+        <button id="toggle-theme" class="toggle-button">Темный режим</button>
+
+        <div class="theme-selector">
+            <label for="language">Выберите язык:</label>
+            <select id="language">
+                <option value="ru">Русский</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+
+        <h2>Последние посещенные страницы:</h2>
+        <ul id="visited-pages">
+            <!-- Здесь будут отображаться последние посещенные страницы -->
+        </ul>
+
+        <button onclick="addVisitedPage('Страница 1')">Посетить страницу 1</button>
+        <button onclick="addVisitedPage('Страница 2')">Посетить страницу 2</button>
+    </div>
+
+    <script>
+        // Функция для работы с cookies
+        function setCookie(name, value, days) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + d.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        // Инициализация темы из cookies
+        function initTheme() {
+            const theme = getCookie("theme");
+            if (theme) {
+                document.body.className = theme;
+                document.getElementById("toggle-theme").textContent = theme === "dark" ? "Светлый режим" : "Темный режим";
+            }
+        }
+
+        // Переключение темы
+        document.getElementById("toggle-theme").onclick = function() {
+            const currentTheme = document.body.className;
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            document.body.className = newTheme;
+            this.textContent = newTheme === "dark" ? "Светлый режим" : "Темный режим";
+            setCookie("theme", newTheme, 7); // Сохраняем выбор темы на 7 дней
+        };
+
+        // Добавление последней посещенной страницы
+        function addVisitedPage(pageTitle) {
+            const visitedPages = document.getElementById("visited-pages");
+            const li = document.createElement("li");
+            li.textContent = pageTitle;
+            visitedPages.appendChild(li);
+            saveVisitedPage(pageTitle);
+        }
+
+        // Сохранение последних посещенных страниц в cookie
+        function saveVisitedPage(pageTitle) {
+            let visited = getCookie("visitedPages");
+            visited = visited ? JSON.parse(visited) : [];
+            if (!visited.includes(pageTitle)) {
+                visited.push(pageTitle);
+                setCookie("visitedPages", JSON.stringify(visited), 7);
+            }
+        }
+
+        // Инициализация посещенных страниц из cookies
+        function initVisitedPages() {
+            const visited = getCookie("visitedPages");
+            if (visited) {
+                const pages = JSON.parse(visited);
+                const visitedPages = document.getElementById("visited-pages");
+                pages.forEach(function(page) {
+                    const li = document.createElement("li");
+                    li.textContent = page;
+                    visitedPages.appendChild(li);
+                });
+            }
+        }
+
+        // Запуск функций инициализации
+        initTheme();
+        initVisitedPages();
+    </script>
+</body>
+</html>
+
