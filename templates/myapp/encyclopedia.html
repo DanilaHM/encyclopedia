@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн-энциклопедия</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+        }
+        p {
+            line-height: 1.6;
+            text-align: justify; /* Выровнять текст по ширине */
+            padding-right: 300px; /* Отступ справа */
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+
+        .dark-theme {
+            background-color: #2c2c2c;
+            color: white;
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    {% load static %}
+</head>
+<body>
+    <div class="container">
+        <h1>Добро пожаловать в Онлайн-энциклопедию!</h1>
+        <p>Наша онлайн-энциклопедия предоставляет обширную информацию по самым различным темам, включая науку, историю, искусство и многие другие области. Мы стремимся обеспечить пользователей качественными и достоверными данными.</p>
+        <img src= "{% static 'image1.jpg' %}" alt="Энциклопедия">
+        <a href="{% url 'page2_view' %}">Перейти на вторую страницу</a>
+    </div>
+
+    <div class="settings-panel">
+        <h3>Настройки</h3>
+        <label for="theme">Тема:</label>
+        <select id="theme" onchange="saveSettings()">
+            <option value="light">Светлая</option>
+            <option value="dark">Темная</option>
+        </select>
+        <br>
+        <label for="language">Язык:</label>
+        <select id="language" onchange="saveSettings()">
+            <option value="ru">Русский</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+
+    <script>
+        // Функция для установки cookie
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        // Функция для получения cookie
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        // Функция для сохранения настроек
+        function saveSettings() {
+            const theme = document.getElementById('theme').value;
+            const language = document.getElementById('language').value;
+            setCookie('theme', theme, 7);
+            setCookie('language', language, 7);
+
+            // Применение темы
+            if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+        }
+
+        // Функция для сохранения последней посещенной страницы ИСПРАВЬ!!!
+        function saveLastVisitedPage() {
+            const currentPage = window.location.href;
+            setCookie('lastVisitedPage', currentPage, 7); // Сохранение на 7 дней
+        }
+
+        // Функция для восстановления настроек при загрузке страницы
+        function loadSettings() {
+            const theme = getCookie('theme');
+            const language = getCookie('language');
+            const lastPage = getCookie('lastVisitedPage');
+
+            if (theme) {
+                document.getElementById('theme').value = theme;
+                if (theme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                }
+            }
+
+            if (language) {
+                document.getElementById('language').value = language;
+            }
+
+            if (lastPage) {
+                console.log('Последняя посещенная страница: ' + lastPage);
+            }
+        }
+
+        // Загружаем настройки при инициализации страницы
+        window.onload = loadSettings;
+    </script>
+</body>
+</html>
